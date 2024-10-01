@@ -4,4 +4,10 @@ var store = [{
         "tags": ["学习笔记","编程"],
         "url": "/init/",
         "teaser": null
+      },{
+        "title": "xv6 pagetable",
+        "excerpt":"pagetable  ","categories": [],
+        "tags": ["operating system","xv6"],
+        "url": "/xv6/",
+        "teaser": null
       }]
