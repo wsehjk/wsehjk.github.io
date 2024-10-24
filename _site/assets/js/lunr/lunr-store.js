@@ -24,7 +24,7 @@ var store = [{
         "teaser": null
       },{
         "title": "Reservoir sampling algorithm",
-        "excerpt":" ","categories": [],
+        "excerpt":"蓄水池采样算法用于在未知大小的数据集中以等概率抽取 k 个样本。 初次使用这个算法 是在我给 kvrocks 社区提交的 #2032pr 中。 算法如下： 数据大小 n 未知 选择前 k 个元素。 对于第 j j &gt; k 个元素，以 k/j 的概率保留，并且随机替换前 k 个元素中的一个 数学证明： 在处理第 j j &gt; k 个元素时，前 k 个中的元素被替换的概率$ p = k/j * 1/k $，则被保留的概率是$ 1 - 1/j = j-1/j $。在处理完 n 个元素之后，元素被保留概率是 \\[\\]...","categories": [],
         "tags": ["algorithm"],
         "url": "/Reservoir-sampling-algorithm/",
         "teaser": null
