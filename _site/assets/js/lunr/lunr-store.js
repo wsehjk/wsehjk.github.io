@@ -41,9 +41,9 @@ var store = [{
         "url": "/mmap/",
         "teaser": null
       },{
-        "title": "成员的封装和暴露",
-        "excerpt":"static, inline, extern, const, constexpr, thread_local 等关键字。  ","categories": [],
+        "title": "hiding and exposure",
+        "excerpt":"static, inline, extern, thread_local static static in class when the keyword static is used to the class member in c++, it means the static member belongs to the class and can be accessed by all the instantiated objects. static func can only access other static member because they don’t know...","categories": [],
         "tags": ["cpp","c"],
-        "url": "/%E6%88%90%E5%91%98%E7%9A%84%E5%B0%81%E8%A3%85%E4%B8%8E%E6%9A%B4%E9%9C%B2/",
+        "url": "/hiding-and-exposing/",
         "teaser": null
       }]
