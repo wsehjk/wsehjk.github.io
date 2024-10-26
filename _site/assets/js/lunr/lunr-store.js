@@ -23,10 +23,10 @@ var store = [{
         "url": "/%E7%90%86%E8%A7%A3%E7%89%B9%E6%AE%8A%E5%87%BD%E6%95%B0%E7%94%9F%E6%88%90/",
         "teaser": null
       },{
-        "title": "Reservoir sampling algorithm",
-        "excerpt":"蓄水池采样算法用于在未知大小的数据集中以等概率抽取 k 个样本。 初次使用这个算法 是在我给 kvrocks 社区提交的 #2032pr 中。 算法如下： 数据大小 n 未知 选择前 k 个元素。 对于第 j j &gt; k 个元素，以 k/j 的概率保留，并且随机替换前 k 个元素中的一个 数学证明： 在处理第 j j &gt; k 个元素时，前 k 个中的元素被替换的概率$ p = k/j * 1/k $，则被保留的概率是$ 1 - 1/j = j-1/j $。在处理完 n 个元素之后，元素被保留概率是 \\[\\]...","categories": [],
+        "title": "Reservior sampling algorithm",
+        "excerpt":"蓄水池采样算法用于在未知大小的数据集中以等概率抽取 k 个样本。 初次使用这个算法 是在我给 kvrocks 社区提交的 #2032pr 中。 算法如下： 数据大小 n 未知 选择前 k 个元素。 对于第 j (j &gt; k) 个元素，以 $\\frac{k}{j}$ 的概率保留，并且随机替换前 k 个元素中的一个 数学证明： 在处理第 j (j &gt; k) 个元素时，前 k 个中的元素被替换的概率$ p = \\frac{k}{j} * \\frac{1}{k} $，则被保留的概率是$ 1 - \\frac{1}{j} = \\frac{j-1}{j} $。在处理完 n 个元素之后，元素被保留概率是 \\[\\frac{k}{k+1}...","categories": [],
         "tags": ["algorithm"],
-        "url": "/Reservoir-sampling-algorithm/",
+        "url": "/Reservior-sampling-algorithm/",
         "teaser": null
       },{
         "title": "Boyer mooer voting algorithm",
@@ -39,5 +39,11 @@ var store = [{
         "excerpt":"从磁盘上的文件读取第一行。 开始我的想法是用 std::fstream 和 std::getline #include &lt;fstream&gt; int main() { std::ifstream ifs(\"test.txt\"); std::string line; std::getline(ifs, line); } 考虑到文件可能比较大，从 std::fstream 中读取需要两次数据拷贝，效率比较差，使用 mmap。 mmap只做了一次数据拷贝，将文件从磁盘读取到 page cache，并且将地址空间中匿名区映射到这片内存，返回相应的内存指针，这样操作文件就像操作内存的字符。 文件映射到内存之后，怎么把第一行提取到 string 里？常规的做法是 从头开始遍历字符串，同时把字符 append 到 string 里，直到遇到第一个换行符 \\n。 p = mmap(); while(p) { if (*p != '\\n') str.push_back(*p); else break; } 这里的问题是，如果第一行字符串很长，append 操作 会引发扩容，数据拷贝，内存回收开销比较大的操作。更好的做法是先找到第一个 \\n，获取长度，string...","categories": [],
         "tags": ["mmap","c++"],
         "url": "/mmap/",
+        "teaser": null
+      },{
+        "title": "成员的封装和暴露",
+        "excerpt":"static, inline, extern, const, constexpr, thread_local 等关键字。  ","categories": [],
+        "tags": ["cpp","c"],
+        "url": "/%E6%88%90%E5%91%98%E7%9A%84%E5%B0%81%E8%A3%85%E4%B8%8E%E6%9A%B4%E9%9C%B2/",
         "teaser": null
       }]
