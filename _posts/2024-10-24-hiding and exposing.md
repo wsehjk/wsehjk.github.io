@@ -146,7 +146,7 @@ in test2::func2 : var = 4
 ```
 `func1` and `func2` operate on its own `var` 
 
-
+[what is a static func in c](https://stackoverflow.com/questions/558122/what-is-a-static-function-in-c)
 ## extern
 
 
