@@ -1,0 +1,86 @@
+<h1 id="kmp笔记">kmp笔记</h1>
+
+<p><code class="language-plaintext highlighter-rouge">kmp</code>算法是巧妙的字符串匹配算法。当模式串(<code class="language-plaintext highlighter-rouge">pattern</code>)和文本(<code class="language-plaintext highlighter-rouge">text</code>)不匹配时，利用模式串的性质得到下一个应该比较的模式串字符，文本串指针不回退，达到线性的运行效率。</p>
+
+<h2 id="brute-force-解法">brute force 解法</h2>
+<p>text:    <code class="language-plaintext highlighter-rouge">abaabacabaabaabaabab</code></p>
+
+<p>pattern: <code class="language-plaintext highlighter-rouge">abaabab</code></p>
+
+<p>暴力解法中，比较第6个字符发现不匹配(<code class="language-plaintext highlighter-rouge">c</code> 和 <code class="language-plaintext highlighter-rouge">b</code>)，文本指针回到1，模式串指针回到0，重新开始匹配。代码实现为：</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="nf">search</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">text</span><span class="p">,</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">pat</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">text</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">-</span> <span class="n">pat</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span><span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">pat</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="n">pat</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="p">{</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">j</span> <span class="o">==</span> <span class="n">pat</span><span class="p">.</span><span class="n">size</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">i</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>发现不匹配时，文本串指针都需要退回(back up)，效率低。</p>
+
+<h2 id="kmp-nondeterministic-finite-state-machinenfa解法">kmp nondeterministic finite state machine(nfa)解法</h2>
+<p>kmp算法利用已有的匹配信息避免文本串指针回溯。即当<code class="language-plaintext highlighter-rouge">text[i]</code>和<code class="language-plaintext highlighter-rouge">pattern[j]</code>不匹配时，有<code class="language-plaintext highlighter-rouge">text[i-j:i]</code>和<code class="language-plaintext highlighter-rouge">pattern[0:j-1]</code>匹配，在上面的例子中，<code class="language-plaintext highlighter-rouge">i = 6, j = 6</code>， <code class="language-plaintext highlighter-rouge">text[i] != pattern[j]</code>，已匹配的前缀就是<code class="language-plaintext highlighter-rouge">abaaba</code>。观察到已经匹配的字符串中，有前缀<code class="language-plaintext highlighter-rouge">aba</code>和后缀<code class="language-plaintext highlighter-rouge">aba</code>匹配，模式串指针回退到3继续匹配。此时<code class="language-plaintext highlighter-rouge">text[6]</code>和<code class="language-plaintext highlighter-rouge">pattern[3]</code>仍然不匹配，需要用<code class="language-plaintext highlighter-rouge">pattern[0:2]</code>的前后缀匹配信息，回退模式串指针到1。。。知道模式串指针为0或者模式串字符和文本字符匹配</p>
+
+<div align="center"><img src="images/page_1.png" width="70%" height="70%" /></div>
+
+<p>现在的问题是，对于模式串<code class="language-plaintext highlighter-rouge">pattern</code>能否提前计算出<code class="language-plaintext highlighter-rouge">next</code>数组，<code class="language-plaintext highlighter-rouge">k = next[i], k != i+1</code>表示在<code class="language-plaintext highlighter-rouge">pattern[0:i]</code>中有<strong>最长</strong>的前缀和后缀<code class="language-plaintext highlighter-rouge">pattern[0:k-1] = pattern[i-k+1:i]</code>。首先有<code class="language-plaintext highlighter-rouge">next[0] = 0</code>。计算<code class="language-plaintext highlighter-rouge">next[i]</code>可以利用<code class="language-plaintext highlighter-rouge">k = next[i-1]</code>，即有<code class="language-plaintext highlighter-rouge">pattern[0:k-1] = pattern[i-k:i-1]</code>。如果<code class="language-plaintext highlighter-rouge">pattern[k] = pattern[i]</code>，那么<code class="language-plaintext highlighter-rouge">next[i] = k+1</code>。如果<code class="language-plaintext highlighter-rouge">pattern[k] != pattern[i]</code>呢？
+这时候要查看<code class="language-plaintext highlighter-rouge">pattern[i-k:i-1]</code>的后缀和<code class="language-plaintext highlighter-rouge">pattern[0:k-1]</code>的前缀匹配的长度，因为有<code class="language-plaintext highlighter-rouge">pattern[0:k-1] = pattern[i-k:i-1]</code>，所以要查看<code class="language-plaintext highlighter-rouge">pattern[0:k-1]</code>的后缀和<code class="language-plaintext highlighter-rouge">pattern[0:k-1]</code>的前缀匹配的长度，这个信息就是<code class="language-plaintext highlighter-rouge">t = next[k-1]</code>， 如果<code class="language-plaintext highlighter-rouge">pattern[t] = pattern[i]</code>，那么<code class="language-plaintext highlighter-rouge">next[i] = t+1</code>。如果<code class="language-plaintext highlighter-rouge">pattern[t] != pattern[i]</code>呢？所以这是个迭代<code class="language-plaintext highlighter-rouge">k</code>的过程。</p>
+
+<div align="center"><img src="images/page_2.jpeg" width="70%" height="70%" /></div>
+
+<div class="language-latex highlighter-rouge"><div class="highlight"><pre class="highlight"><code>next[0] = 0
+对于i &gt; 0, k = next[i-1], 如果pattern[k] != pattern[i] k &lt;- next[k-1]
+否则 next[i] = k+1
+</code></pre></div></div>
+
+<p>代码实现为</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">KMP</span> <span class="p">{</span>
+   <span class="nl">private:</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">pat_</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">next_</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="n">GetNext</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">pat_</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">next_</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+            <span class="k">while</span> <span class="p">(</span><span class="n">k</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">pat_</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">pat_</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="p">{</span>
+                <span class="n">k</span> <span class="o">=</span> <span class="n">next_</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+            <span class="p">}</span>
+            <span class="c1">//判断 k!= 0 避免 pat_[0] != pat_[i]，计算next_[-1]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">pat_</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">pat_</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="p">{</span>
+                <span class="n">k</span> <span class="o">++</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="n">next_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+   <span class="k">public</span><span class="o">:</span>
+    <span class="n">KMP</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">pat</span><span class="p">)</span> <span class="o">:</span> <span class="n">pat_</span><span class="p">(</span><span class="n">pat</span><span class="p">),</span> <span class="n">next_</span><span class="p">(</span><span class="n">pat</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>      
+        <span class="n">GetNext</span><span class="p">();</span> 
+    <span class="p">}</span>
+    <span class="c1">// 给定文本串，返回模式串在文本串中出现的位置</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">Search</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">txt</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">pos</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="n">txt</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+        <span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>  <span class="c1">//对于i, c</span>
+                    <span class="c1">//表示已经匹配的字符数，或者和txt[i]比较的模式串字符下标</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">while</span> <span class="p">(</span><span class="n">c</span> <span class="o">&amp;&amp;</span> <span class="n">pat_</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">!=</span> <span class="n">txt</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="p">{</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">next_</span><span class="p">[</span><span class="n">c</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">pat_</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">==</span> <span class="n">txt</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="p">{</span>
+                <span class="n">c</span> <span class="o">++</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="n">pat_</span><span class="p">.</span><span class="n">size</span><span class="p">())</span> <span class="p">{</span>
+                <span class="n">pos</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">next</span><span class="p">[</span><span class="n">c</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">pos</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
