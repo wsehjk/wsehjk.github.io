@@ -84,15 +84,11 @@ class StringTable {
 public:
     StringTable() {};
     ~StringTable() = default;
-    // 拷贝构造函数（验证是否触发拷贝操作）
+    // copy ctor (test copy)
     StringTable(const StringTable& other) : mp(other.mp) {
         std::cout << "Copy constructor called\n";
     }
 
-    // 移动构造函数（验证是否触发移动操作）
-    // StringTable(StringTable&& other) noexcept : mp(std::move(other.mp)) {
-    //     std::cout << "Move constructor called\n";
-    // }
     StringTable(StringTable&& other) = default; 
     void insert(int id, std::string value) {
         mp[id] = value;
